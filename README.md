@@ -19,6 +19,8 @@ A Salesforce Developer Edition project built to practise Salesforce administrati
 ## Built by
 Kavish Muthusamy Karthi, Salesforce Certified Administrator
 
+## Folders
+
 
 ```mermaid
 erDiagram
