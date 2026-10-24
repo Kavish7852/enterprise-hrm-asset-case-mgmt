@@ -92,28 +92,83 @@ erDiagram
 ```
 
 
-# Progress
-1
-Fix the Manager field
-If you haven't yet: Object Manager, Employee, Fields and Relationships, click Direct Reports, Edit. Change Field Label to Manager and Field Name to Manager. Save.
-2
-Create the IT Asset object and its fields
-Object Manager, Create, Custom Object. Label: IT Asset. Plural: IT Assets. Tick Starts with vowel sound. Record Name: change the label to Asset Tag, Data Type Auto Number, Display Format AST-{0000}, Starting Number 1. Tick Allow Reports, Allow Activities and Track Field History. Deployment Status Deployed. Tick Launch New Custom Tab Wizard and Save. Then add these fields (Fields and Relationships, New): Serial Number (Text 50, tick Required, Unique and External ID); Asset Type (Picklist: Laptop, Desktop, Monitor, Mobile, Accessories); Status (Picklist: Available, Allocated, Under Repair, Retired, with the first value as default); Purchase Date (Date); Warranty End (Date); Assigned To (Lookup to Employee).
-3
-Create the Asset Request object and its fields
-Create a custom object in the same way. Label: Asset Request. Record Name label: Request No, Data Type Auto Number, Display Format REQ-{0000}. Same options and tab wizard. Then add fields: Requested By (Master-Detail Relationship to Employee, the first field you create); Asset Type (Picklist with the same five values); Justification (Text Area); Priority (Picklist: Low, Medium, High, with Medium as default); Status (Picklist: Draft, Submitted, Approved, Rejected, Fulfilled, with Draft as default); Estimated Cost (Currency); Allocated Asset (Lookup to IT Asset).
-4
-Create the Asset Assignment junction object
-Create a custom object. Label: Asset Assignment. Record Name label: Assignment No, Auto Number, Display Format ASG-{0000}. Add the first Master-Detail field: Employee (Master-Detail Relationship to Employee). Then add a second Master-Detail field: IT Asset (Master-Detail Relationship to IT Asset). The first one becomes the primary master. Then add Assigned Date (Date), Returned Date (Date) and Condition (Picklist: Good, Fair, Damaged).
-5
-Add the roll-up summary on Employee
-Object Manager, Employee, Fields and Relationships, New. Choose Roll-Up Summary. Field Label: Assets Assigned. Summarized Object: Asset Assignment. Roll-Up Type: COUNT. Filter Criteria: Only records meeting certain criteria, then Returned Date, equals, and leave the value empty. Save. This counts only assets that have not been returned.
-6
-Add two lookups on Case
-Object Manager, Case, Fields and Relationships, New. Create a Lookup to Employee with Field Label Employee. Create another Lookup to IT Asset with Field Label Related Asset. Click Next and Save each time.
-7
-Add one validation rule
-Object Manager, IT Asset, Validation Rules, New. Rule Name: Warranty_After_Purchase. Formula: AND(NOT(ISBLANK(Purchase_Date__c)), NOT(ISBLANK(Warranty_End__c)), Warranty_End__c < Purchase_Date__c). Error Message: Warranty End cannot be before Purchase Date. Error Location: Field, and choose Warranty End. Save.
-8
-Screenshots, upload and tick Phase 1
-Take a screenshot of each object's Fields and Relationships list (Employee, IT Asset, Asset Request, Asset Assignment) and name them clearly, for example phase1-it-asset-fields.png. Upload them to the Images folder on GitHub with Add file, Upload files. In README, change - [ ] Phase 1 to - [x] Phase 1. Then send me the IT Asset and Asset Assignment screenshots.
+## 🛠️ Step-by-Step Data Model & Schema Implementation
+
+### Phase 1: Custom Objects, Fields & Schema Configuration
+
+#### 1. Update Existing Objects
+* **Employee (`Employee__c`):**
+  * Navigate to **Setup > Object Manager > Employee > Fields & Relationships**.
+  * Locate `Direct Reports`, click **Edit**.
+  * Change **Field Label** to `Manager` and **Field Name** to `Manager`. Click **Save**.
+
+---
+
+#### 2. Create `IT Asset` Custom Object
+* **Object Setup:**
+  * **Label:** `IT Asset` | **Plural Label:** `IT Assets` *(Check: Starts with vowel sound)*
+  * **Record Name:** `Asset Tag` | **Data Type:** `Auto Number`
+  * **Display Format:** `AST-{0000}` | **Starting Number:** `1`
+  * **Optional Features:** Check *Allow Reports*, *Allow Activities*, and *Track Field History*.
+  * **Deployment Status:** `Deployed`
+  * **Tab:** Launch New Custom Tab Wizard on Save.
+
+* **Fields & Relationships:**
+
+| Field Label | API Name | Data Type | Configuration / Picklist Values |
+| :--- | :--- | :--- | :--- |
+| **Serial Number** | `Serial_Number__c` | Text (50) | Required, Unique, External ID |
+| **Asset Type** | `Asset_Type__c` | Picklist | `Laptop`, `Desktop`, `Monitor`, `Mobile`, `Accessories` |
+| **Status** | `Status__c` | Picklist | `Available` (Default), `Allocated`, `Under Repair`, `Retired` |
+| **Purchase Date** | `Purchase_Date__c` | Date | — |
+| **Warranty End** | `Warranty_End__c` | Date | — |
+| **Assigned To** | `Assigned_To__c` | Lookup | Lookup to `Employee__c` |
+
+---
+
+#### 3. Create `Asset Request` Custom Object
+* **Object Setup:**
+  * **Label:** `Asset Request` | **Plural Label:** `Asset Requests`
+  * **Record Name:** `Request No` | **Data Type:** `Auto Number`
+  * **Display Format:** `REQ-{0000}` | **Starting Number:** `1`
+  * **Tab:** Create Custom Tab on Save.
+
+* **Fields & Relationships:**
+
+| Field Label | API Name | Data Type | Configuration / Picklist Values |
+| :--- | :--- | :--- | :--- |
+| **Requested By** | `Requested_By__c` | Master-Detail | Primary Master-Detail to `Employee__c` |
+| **Asset Type** | `Asset_Type__c` | Picklist | `Laptop`, `Desktop`, `Monitor`, `Mobile`, `Accessories` |
+| **Justification** | `Justification__c` | Text Area | — |
+| **Priority** | `Priority__c` | Picklist | `Low`, `Medium` (Default), `High` |
+| **Status** | `Status__c` | Picklist | `Draft` (Default), `Submitted`, `Approved`, `Rejected`, `Fulfilled` |
+| **Estimated Cost** | `Estimated_Cost__c` | Currency | — |
+| **Allocated Asset** | `Allocated_Asset__c` | Lookup | Lookup to `IT_Asset__c` |
+
+---
+
+#### 4. Create `Asset Assignment` Junction Object
+* **Object Setup:**
+  * **Label:** `Asset Assignment` | **Plural Label:** `Asset Assignments`
+  * **Record Name:** `Assignment No` | **Data Type:** `Auto Number`
+  * **Display Format:** `ASG-{0000}` | **Starting Number:** `1`
+
+* **Fields & Relationships:**
+
+| Field Label | API Name | Data Type | Configuration / Picklist Values |
+| :--- | :--- | :--- | :--- |
+| **Employee** | `Employee__c` | Master-Detail | Master-Detail to `Employee__c` (Primary) |
+| **IT Asset** | `IT_Asset__c` | Master-Detail | Master-Detail to `IT_Asset__c` (Secondary) |
+| **Assigned Date** | `Assigned_Date__c` | Date | — |
+| **Returned Date** | `Returned_Date__c` | Date | — |
+| **Condition** | `Condition__c` | Picklist | `Good`, `Fair`, `Damaged` |
+
+---
+
+#### 5. Roll-Up Summary & Case Object Extensions
+* **Roll-Up Summary on `Employee__c`:**
+  * **Field Label:** `Assets Assigned` (`Assets_Assigned__c`)
+  * **Summarized Object:** `Asset Assignment`
+  * **Roll-Up Type:** `COUNT`
+  * **
+
