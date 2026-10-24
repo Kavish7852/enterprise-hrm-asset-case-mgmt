@@ -92,6 +92,9 @@ erDiagram
 ```
 
 
+### Complete Combined Phase 1 Section (Ready to Paste):
+
+```markdown
 ## 🛠️ Step-by-Step Data Model & Schema Implementation
 
 ### Phase 1: Custom Objects, Fields & Schema Configuration
@@ -165,10 +168,36 @@ erDiagram
 
 ---
 
-#### 5. Roll-Up Summary & Case Object Extensions
-* **Roll-Up Summary on `Employee__c`:**
-  * **Field Label:** `Assets Assigned` (`Assets_Assigned__c`)
-  * **Summarized Object:** `Asset Assignment`
-  * **Roll-Up Type:** `COUNT`
-  * **
+#### 5. Roll-Up Summary on `Employee`
+* Navigate to **Setup > Object Manager > Employee > Fields & Relationships > New**.
+* **Type:** Roll-Up Summary
+* **Field Label:** `Assets Assigned` (`Assets_Assigned__c`)
+* **Summarized Object:** `Asset Assignment`
+* **Roll-Up Type:** `COUNT`
+* **Filter Criteria:** Only records meeting criteria: `Returned Date` `equals` `null` *(Counts active assigned assets)*
 
+---
+
+#### 6. Extend Standard `Case` Object
+* Navigate to **Setup > Object Manager > Case > Fields & Relationships > New**.
+
+| Field Label | API Name | Data Type | Configuration |
+| :--- | :--- | :--- | :--- |
+| **Employee** | `Employee__c` | Lookup | Lookup Relationship to `Employee__c` |
+| **Related Asset** | `Related_Asset__c` | Lookup | Lookup Relationship to `IT_Asset__c` |
+
+---
+
+#### 7. Add Data Validation Logic
+* Navigate to **Setup > Object Manager > IT Asset > Validation Rules > New**.
+
+* **Rule Setup:**
+  * **Rule Name:** `Warranty_After_Purchase`
+  * **Active:** `Checked`
+* **Formula:**
+  ```sql
+  AND(
+      NOT(ISBLANK(Purchase_Date__c)),
+      NOT(ISBLANK(Warranty_End__c)),
+      Warranty_End__c < Purchase_Date__c
+  )
